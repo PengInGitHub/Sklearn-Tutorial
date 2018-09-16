@@ -26,7 +26,9 @@ Created on Fri Sep 14 23:55:24 2018
 ####Feature Engineering
 ####Modelling
 
-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
 
@@ -48,7 +50,7 @@ anjuke.shape#(3000, 7)
 df.shape#(23677, 12)
 df.info()
 #Elevator has missing 
-
+df.describe()
 ###visualizaion to single variable
 
 ##Elevator
@@ -83,11 +85,56 @@ ax2.set_xlabel('If Elevator Exists')
 ax2.set_ylabel('Price')
 plt.show()
 
+###Floor
+##visualise
+#use f, ax1 = plt.subplots(figsize=(20,5))
+#use sns.countplot(df['var'], ax=ax1)
+f, ax1 = plt.subplots(figsize=(20,5))
+sns.countplot(df['Floor'], ax=ax1)
+ax1.set_title('Count of Real Estate Per Floor', fontsize=15)
+ax1.set_xlabel('Floor')
+ax1.set_ylabel('Count of Real Estate')
+plt.show()
+#this feature depends highly on region and culture
+#6, 7 and 8 may be prefered in China in general
+#this var is significant but quite complex 
+help(plt.subplots)
 
+###Layout
+f, ax1 = plt.subplots(figsize=(20, 20))
+sns.countplot(y='Layout', data=df, ax=ax1)
+ax1.set_title('Count of Real Estate Per Layout', fontsize=15)
+ax1.set_xlabel('Count of Real Estate')
+ax1.set_ylabel('Layout')
+plt.show()
 
+###Region
 
+##add new feature
+#avg price: price per square
+df['PerPrice'] = df['Price']/df['Size']
+#check new var
+df.head(2)
+df_house_count = df.groupby('Region')['Price'].count().sort_values(ascending=False).to_frame().reset_index()
+df_house_mean = df.groupby('Region')['PerPrice'].mean().sort_values(ascending=False).to_frame().reset_index()
 
+f, [ax1, ax2, ax3] = plt.subplots(3, 1, figsize=(20,15))
+sns.barplot(x='Region', y='PerPrice', palette='Blues_d', data=df_house_mean, ax=ax1)
+ax1.set_title('Comparison of Second-Hand Property Price Per Square By Region', fontsize=15)
+ax1.set_xlabel('Region')
+ax1.set_ylabel('Price Per Square')
 
+sns.barplot(x='Region', y='Price', palette="Greens_d", data=df_house_count, ax=ax2)
+ax2.set_title('Comparison of Second-Hand Property Quantity By Region', fontsize=15)
+ax2.set_xlabel('Region')
+ax2.set_ylabel('Quantity')
+
+sns.boxplot(x='Region', y='Price', data=df, ax=ax3)
+ax3.set_title('Comparison of Second-Hand Property Total Value By Region', fontsize=15)
+ax3.set_xlabel('Region')
+ax3.set_ylabel('Total Value')
+
+plt.show()
 
 
 list(df.columns.values)
